@@ -2,6 +2,8 @@
 
 PHP library which makes the process of CSV data files imports into MySQL easier.
 
+![Tests status](https://github.com/ideaconnect/php-db-csv-writer/workflows/All%20tests%20using%20PHPUnit/badge.svg) [![Coverage Status](https://coveralls.io/repos/github/ideaconnect/php-db-csv-writer/badge.svg?branch=master)](https://coveralls.io/github/ideaconnect/php-db-csv-writer?branch=master) ![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/ideaconnect/php-db-csv-writer?label=latest%20version&sort=semver)
+
 Allows easy building of ready-to-import CSV collections for MySQL-compatible (like MariaDB etc.) PDO-accessible database connections.
 
 You can add new data entries into the collection by calling `appendData(array)` and later load the file into the database by calling `storeCollection`.

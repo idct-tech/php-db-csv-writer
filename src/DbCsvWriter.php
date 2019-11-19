@@ -2,10 +2,9 @@
 
 namespace IDCT\CsvWriter;
 
-use IDCT\CsvWriter\CsvWriter;
+use InvalidArgumentException;
 use PDO;
 use RuntimeException;
-use InvalidArgumentException;
 
 /**
  * DbCsvWriter allows buffered Csv data to be loaded easily into target database
@@ -56,6 +55,14 @@ class DbCsvWriter
      * @var boolean
      */
     protected $isRemote;
+
+    /**
+     * Number of results loaded into the database during last query.
+     * Null is returned until any query is executed.
+     *
+     * @var int|null
+     */
+    protected $lastResultsCount;
 
     /**
      * Creates instance of the new DbCsvWriter with required settings and
@@ -113,8 +120,8 @@ class DbCsvWriter
      *
      * @var boolean|null
      */
-    public function isDbRemote(): ?bool 
-    {        
+    public function isDbRemote(): ?bool
+    {
         return $this->isRemote;
     }
 
@@ -139,6 +146,7 @@ class DbCsvWriter
     public function setBufferSize($bufferSize): self
     {
         $this->csvWriter->setBufferSize($bufferSize);
+
         return $this;
     }
 
@@ -160,6 +168,7 @@ class DbCsvWriter
         }
 
         $this->tmpDir = $path;
+
         return $this;
     }
 
@@ -178,20 +187,8 @@ class DbCsvWriter
     }
 
     /**
-     * Escapes slashes in the text.
-     * 
-     * @param string
-     * @return string
-     */
-    protected function escape(string $string): string
-    {
-        $string = str_replace('\\', '\\\\', $string);
-        return $string;
-    }
-
-    /**
      * Answers if any collection is opened.
-     * 
+     *
      * @return boolean
      */
     public function hasOpenCollection(): bool
@@ -240,7 +237,7 @@ class DbCsvWriter
             throw new InvalidArgumentException('Fields names must be non-empty array of strings.');
         }
 
-        foreach($fields as $field) {
+        foreach ($fields as $field) {
             if (!preg_match('/^[A-Za-z][A-Za-z0-9_]+$/i', $field)) {
                 throw new InvalidArgumentException('Invalid field name: `' . $field . '`.');
             }
@@ -275,15 +272,14 @@ class DbCsvWriter
             throw new InvalidArgumentException('Collection name cannot be empty.');
         }
 
-    
         if (strtolower(substr($name, -4, 4)) === ".csv") {
-           //already full path
-           $path = $name;
+            //already full path
+            $path = $name;
         } else {
             if (!preg_match('/^[0-9a-z\-_]+$/i', $name)) {
                 throw new InvalidArgumentException('Collection name must non-empty string consisting only letters, numbers and - _ symbols.');
             }
-           $path = $this->getTmpDir() . $name . '.csv';
+            $path = $this->getTmpDir() . $name . '.csv';
         }
 
         if (!file_exists($path) || !is_readable($path)) {
@@ -355,7 +351,7 @@ class DbCsvWriter
             throw new RuntimeException('No open collection.');
         }
 
-        if(!($this->getPdo() instanceof PDO)) {
+        if (!($this->getPdo() instanceof PDO)) {
             throw new RuntimeException('Missing db connection: assign PDO using setPdo(PDO $pdo).');
         }
 
@@ -366,14 +362,6 @@ class DbCsvWriter
     }
 
     /**
-     * Number of results loaded into the database during last query. 
-     * Null is returned until any query is executed.
-     * 
-     * @var int|null
-     */
-    protected $lastResultsCount;
-
-    /**
      * Returns last operation's results count.
      *
      * @return int|null
@@ -381,6 +369,19 @@ class DbCsvWriter
     public function getLastResultCount(): ?int
     {
         return $this->lastResultsCount;
+    }
+
+    /**
+     * Escapes slashes in the text.
+     *
+     * @param string
+     * @return string
+     */
+    protected function escape(string $string): string
+    {
+        $string = str_replace('\\', '\\\\', $string);
+
+        return $string;
     }
 
     /**

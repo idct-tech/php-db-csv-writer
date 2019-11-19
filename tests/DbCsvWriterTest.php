@@ -7,12 +7,10 @@ namespace IDCT\CsvWriter\Tests;
 use IDCT\CsvWriter\CsvWriter;
 use IDCT\CsvWriter\DbCsvWriter;
 use InvalidArgumentException;
-use LogicException;
-use org\bovigo\vfs\vfsStream;        
-use org\bovigo\vfs\vfsStreamDirectory;
+use org\bovigo\vfs\vfsStream;
+use PDO;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use \PDO;
 
 final class DbCsvWriterTest extends TestCase
 {
@@ -63,7 +61,7 @@ final class DbCsvWriterTest extends TestCase
         $this->expectException(RuntimeException::class);
 
         $fileSystemMock = vfsStream::setup('sampleDir');
-        $tmpdir = $fileSystemMock->url('sampleDir') . DIRECTORY_SEPARATOR . 'invalid'; 
+        $tmpdir = $fileSystemMock->url('sampleDir') . DIRECTORY_SEPARATOR . 'invalid';
 
         $dbCsvWriter->setTmpDir($tmpdir);
     }
@@ -73,7 +71,7 @@ final class DbCsvWriterTest extends TestCase
         $dbCsvWriter = new DbCsvWriter();
         $this->expectException(RuntimeException::class);
 
-        $fileSystemMock = vfsStream::setup('sampleDir');            
+        $fileSystemMock = vfsStream::setup('sampleDir');
         $fileSystemMock->chmod(0400);
         $dbCsvWriter->setTmpDir($fileSystemMock->url('sampleDir'));
     }
@@ -93,10 +91,8 @@ final class DbCsvWriterTest extends TestCase
         $this->assertEquals(11, $dbCsvWriter->getBufferSize());
     }
 
-
     public function testAppendData()
     {
-
         $dbCsvWriter = $this->getMockBuilder(DbCsvWriter::class)
         ->setMethods(['getCsvWriter', 'hasOpenCollection', 'escape'])
         ->getMock();
@@ -140,14 +136,14 @@ final class DbCsvWriterTest extends TestCase
     {
         $dbCsvWriter = new DbCsvWriter();
         $this->expectException(InvalidArgumentException::class);
-        $dbCsvWriter->startCollection('aa',[]);
+        $dbCsvWriter->startCollection('aa', []);
     }
 
     public function testStartCollectionInvalidInvalidFields()
     {
         $dbCsvWriter = new DbCsvWriter();
         $this->expectException(InvalidArgumentException::class);
-        $dbCsvWriter->startCollection('aa',['aa','a$b']);
+        $dbCsvWriter->startCollection('aa', ['aa','a$b']);
     }
 
     public function testStartCollection()
@@ -163,7 +159,7 @@ final class DbCsvWriterTest extends TestCase
 
         $csvWriter->expects($this->once())
             ->method('open')
-            ->willReturn($csvWriter);            
+            ->willReturn($csvWriter);
 
         $dbCsvWriter->expects($this->once())
             ->method('getCsvWriter')
@@ -247,7 +243,7 @@ final class DbCsvWriterTest extends TestCase
 
         $dbCsvWriter->expects($this->any())
             ->method('getCsvWriter')
-            ->willReturn($csvWriter);            
+            ->willReturn($csvWriter);
 
         $fileSystemMock = vfsStream::setup('sampleDir');
         $tmpdir = $fileSystemMock->url('sampleDir');
@@ -281,7 +277,7 @@ final class DbCsvWriterTest extends TestCase
 
         $dbCsvWriter->expects($this->any())
             ->method('getCsvWriter')
-            ->willReturn($csvWriter);            
+            ->willReturn($csvWriter);
 
         $fileSystemMock = vfsStream::setup('sampleDir');
         $tmpdir = $fileSystemMock->url('sampleDir');
@@ -294,7 +290,7 @@ final class DbCsvWriterTest extends TestCase
         $dbCsvWriter->closeCollection(true);
         $this->assertFalse($dbCsvWriter->hasOpenCollection());
         $this->assertNull($dbCsvWriter->getOpenCollectionsPath());
-    }    
+    }
 
     public function testRemoveCollectionError()
     {
@@ -314,19 +310,19 @@ final class DbCsvWriterTest extends TestCase
         $dbCsvWriter->expects($this->once())
             ->method('closeCollection')
             ->willReturn($dbCsvWriter);
-    /*
-        $csvWriter = $this->createMock(CsvWriter::class);
-        $csvWriter->expects($this->once())
-            ->method('write')
-            ->willReturn($csvWriter);
+        /*
+            $csvWriter = $this->createMock(CsvWriter::class);
+            $csvWriter->expects($this->once())
+                ->method('write')
+                ->willReturn($csvWriter);
 
-        $csvWriter->expects($this->once())
-            ->method('open')
-            ->willReturn($csvWriter);
+            $csvWriter->expects($this->once())
+                ->method('open')
+                ->willReturn($csvWriter);
 
-        $dbCsvWriter->expects($this->any())
-            ->method('getCsvWriter')
-            ->willReturn($csvWriter);         
+            $dbCsvWriter->expects($this->any())
+                ->method('getCsvWriter')
+                ->willReturn($csvWriter);
 */
         $fileSystemMock = vfsStream::setup('sampleDir');
         $tmpdir = $fileSystemMock->url('sampleDir');
@@ -385,15 +381,15 @@ final class DbCsvWriterTest extends TestCase
             ->method('hasOpenCollection')
             ->willReturn(true);
 
-            $dbCsvWriter->expects($this->once())
+        $dbCsvWriter->expects($this->once())
             ->method('getPdo')
             ->willReturn($pdo);
 
-            $dbCsvWriter->expects($this->once())
+        $dbCsvWriter->expects($this->once())
             ->method('closeCollection')
             ->willReturn($dbCsvWriter);
 
-            $dbCsvWriter->expects($this->once())
+        $dbCsvWriter->expects($this->once())
             ->method('saveFromCsvFile')
             ->willReturn(5);
 
@@ -433,7 +429,7 @@ HEREDATA;
 
         $dbCsvWriter->setPdo($pdo, false);
 
-    $expected = <<<HEREDATA
+        $expected = <<<HEREDATA
 LOAD DATA LOW_PRIORITY INFILE "vfs://sampleDir/bbb.csv"
 INTO TABLE bbb
 CHARACTER SET utf8
@@ -449,40 +445,38 @@ HEREDATA;
         $dbCsvWriter->appendData(['data\\2_2', 'da\\ta\\2_2']);
         $dbCsvWriter->storeCollection('bbb');
         
-        $expectedFileContents = "aa,bb\n" . 
+        $expectedFileContents = "aa,bb\n" .
         "\"data\\\\1_1\",\"da\\\\ta\\\\1_2\"\n" .
         ("\"data\\\\2_2\",\"da\\\\ta\\\\2_2\"\n");
 
         $this->assertEquals(\file_get_contents($tmpdirSlash . 'bbb.csv'), $expectedFileContents); //tests escape
         $this->assertEquals($expected, $pdo->lastQuery);
-
-
     }
 
-/*
-    public function testOpenCollection()
-    {
-        $dbCsvWriter = $this->getMockBuilder(DbCsvWriter::class)
-        ->setMethods(['getCsvWriter'])
-        ->getMock();
-
-        $csvWriter = $this->createMock(CsvWriter::class);
-        $csvWriter->expects($this->once())
-            ->method('write')
-            ->willReturn($csvWriter);
-
-        $csvWriter->expects($this->once())
-            ->method('open')
-            ->willReturn($csvWriter);            
-
-        $dbCsvWriter->expects($this->once())
-            ->method('getCsvWriter')
-            ->willReturn($csvWriter);
-
-        $this->assertFalse($dbCsvWriter->hasOpenCollection());
-        $dbCsvWriter->startCollection('aaa', ['aa','bb']);
-        $this->assertTrue($dbCsvWriter->hasOpenCollection());
-
-        //any assertion here would require actual CsvWriter verification
-    }    */
+    /*
+        public function testOpenCollection()
+        {
+            $dbCsvWriter = $this->getMockBuilder(DbCsvWriter::class)
+            ->setMethods(['getCsvWriter'])
+            ->getMock();
+    
+            $csvWriter = $this->createMock(CsvWriter::class);
+            $csvWriter->expects($this->once())
+                ->method('write')
+                ->willReturn($csvWriter);
+    
+            $csvWriter->expects($this->once())
+                ->method('open')
+                ->willReturn($csvWriter);
+    
+            $dbCsvWriter->expects($this->once())
+                ->method('getCsvWriter')
+                ->willReturn($csvWriter);
+    
+            $this->assertFalse($dbCsvWriter->hasOpenCollection());
+            $dbCsvWriter->startCollection('aaa', ['aa','bb']);
+            $this->assertTrue($dbCsvWriter->hasOpenCollection());
+    
+            //any assertion here would require actual CsvWriter verification
+        }    */
 }
