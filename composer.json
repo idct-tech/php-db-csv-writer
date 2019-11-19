@@ -1,0 +1,56 @@
+{
+    "name": "idct/php-db-csv-writer",
+    "description": "Library which simplifies bulk data loading into MySQL-compatible database engines using CSV collections.",
+    "keywords": [
+        "mysql",
+        "database",
+        "mariadb",
+        "bulk",
+        "import",
+        "bulk-import",
+        "import",
+        "csv",
+        "eol",
+        "io",
+        "textwriter",
+        "csvwriter",
+        "text",
+        "idct"
+    ], 
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Bartosz Pachołek",
+            "email": "bartosz@idct.pl",
+            "role": "Lead"
+        }
+    ],
+    "repositories": [],
+    "require": {
+        "idct/php-csv-writer": "^1.0",
+        "php": ">=7.1",
+        "ext-ctype": "*",
+        "ext-mbstring": "*"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.16",
+        "phpunit/phpunit": "^7.5",
+        "mikey179/vfsstream": "^1.6.8",
+        "php-mock/php-mock-phpunit": "^2.5",
+        "satooshi/php-coveralls": "^2.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "IDCT\\CsvWriter\\": "src/"
+        }
+    },
+    "scripts": {
+        "test": [
+            "./vendor/phpunit/phpunit/phpunit"
+        ],
+        "generate-coveralls": [
+            "./vendor/satooshi/php-coveralls/bin/php-coveralls -v"
+        ]
+
+    }
+}
