@@ -427,8 +427,8 @@ IGNORE 1 LINES
 (`aa`,`bb`)
 HEREDATA;
 
+        $this->assertEquals($expected, str_replace("\r\n", "\n", $pdo->lastQuery));
         $dbCsvWriter->setPdo($pdo, false);
-
         $expected = <<<HEREDATA
 LOAD DATA LOW_PRIORITY INFILE "vfs://sampleDir/bbb.csv"
 INTO TABLE bbb
@@ -450,7 +450,7 @@ HEREDATA;
         ("\"data\\\\2_2\",\"da\\\\ta\\\\2_2\"\n");
 
         $this->assertEquals(\file_get_contents($tmpdirSlash . 'bbb.csv'), $expectedFileContents); //tests escape
-        $this->assertEquals($expected, $pdo->lastQuery);
+        $this->assertEquals($expected, str_replace("\r\n", "\n", $pdo->lastQuery));
     }
 
     /*
