@@ -15,7 +15,6 @@ class PDOExecTest extends PDO
     public function exec($query)
     {
         $this->lastQuery = $query;
-
         return 55;
     }
 }
