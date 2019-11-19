@@ -422,7 +422,6 @@ class DbCsvWriter
     {
         // import data from csv
         $fields = $this->getSqlFieldStringFromCsvFile($csvFile);
-
         $filePosition = ' ';
         if ($this->IsDbRemote()) {
             $filePosition = ' LOCAL ';
