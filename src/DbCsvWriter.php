@@ -404,11 +404,9 @@ class DbCsvWriter
     {
         $fields = fgetcsv($handle = fopen($csvFile, 'r'));
         fclose($handle);
-
         array_walk($fields, function ($field, $key) use (&$fields) {
             $fields[$key] = "`$field`";
         });
-
         return join(',', $fields);
     }
 
