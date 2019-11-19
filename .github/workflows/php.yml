@@ -1,6 +1,6 @@
 name: All tests using PHPUnit
 
-on: [status]
+on: [push]
 
 jobs:
   build:
@@ -9,7 +9,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    
+      with:
+      ref: master
+
     - name: Setup PHP
       uses: shivammathur/setup-php@master
       with:
