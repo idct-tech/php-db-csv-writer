@@ -27,7 +27,7 @@
     ],
     "repositories": [],
     "require": {
-        "idct/php-csv-writer": "^1.0",
+        "idct/php-csv-writer": "^1.0.5",
         "php": ">=7.1",
         "ext-ctype": "*",
         "ext-mbstring": "*"
